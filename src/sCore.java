@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 public class sCore {
-	public static void loadSlaps(){
-		if (!new File(sChat.slaps).exists()) {
+	public static void loadSlaps()
+	{
+		if (!new File(sChat.slaps).exists())
+		{
 			FileWriter writer = null;
 			try {
 				writer = new FileWriter(sChat.slaps);
@@ -59,99 +61,103 @@ public class sCore {
 			}
 		}
 	}
-	
-	public static void loadChannels(){
-		String[] chanList = sChat.sconf.getString("channels").split(",");
-		for (int i = 0; i < chanList.length; i++) {
+
+	public static void loadChannels()
+	{
+		String[] chanList = sChat.channels.getString("channels").split(",");
+		for (int i = 0; i < chanList.length; i++)
+		{
 			sListener.channels.add("#"+chanList[i]);
 		}
 	}
-	
-	public static String replaceColor(String text)
+
+	public String getNickname(Player p)
 	{
-		String symbol = sChat.sconf.getString("color-symbol");
-		if (text.contains(symbol + "4")
-				|| text.contains(symbol + "c")
-	    		|| text.contains(symbol + "e")
-	    		|| text.contains(symbol + "2")
-	    		|| text.contains(symbol + "a")
-	    		|| text.contains(symbol + "b")
-	    		|| text.contains(symbol + "3")
-	    		|| text.contains(symbol + "1")
-	    		|| text.contains(symbol + "9")
-	    		|| text.contains(symbol + "d")
-	    		|| text.contains(symbol + "5")
-	    		|| text.contains(symbol + "f")
-	    		|| text.contains(symbol + "7")
-	    		|| text.contains(symbol + "8")
-	    		|| text.contains(symbol + "0")
-	    		) text = text.replaceAll(symbol, "\u00A7");
-		return text;
+		if (sChat.nicknames.keyExists(p.getName()))
+		{
+			String nickname = sChat.nicknames.getString(p.getName());
+			if (sChat.sconf.getBoolean("color-format")) nickname = p.getColor()+nickname+"\u00A7f";
+			return nickname;
+	    }
+		return p.getName();
 	}
 	
-	public static String getName(Player p) {
-		if (sChat.nicknames.keyExists(p.getName())) {
-			return sChat.nicknames.getString(p.getName());
-		}
-		return p.getName();
-	}
-		  
-	public static String getListName(Player p) {
-		if (sChat.listnames.keyExists(p.getName())) {
-			return sChat.listnames.getString(p.getName());
-		}
-		return p.getName();
-	}
-
-	public static String getGroup(Player p) {
-		if (sChat.groupnames.keyExists(p.getGroups()[0])) {
-			return replaceColor(sChat.groupnames.getString(p.getGroups()[0]));
-		}
+	public String getGroupName(Player p)
+	{
+		if (sChat.groupnames.keyExists(p.getName()))
+		{
+			String groupname = sChat.groupnames.getString(p.getGroups()[0]);
+			if (sChat.sconf.getBoolean("color-chat")) groupname = p.getColor()+groupname+"\u00A7f";
+			return groupname;
+	    }
 		return p.getGroups()[0];
 	}
 
-	public static String getListGroup(Player p) {
-		if (sChat.grouplistnames.keyExists(p.getGroups()[0])) {
-			return replaceColor(sChat.grouplistnames.getString(p.getGroups()[0]));
-		}
-		return p.getGroups()[0];
-	}
-		  
-	public static String chanName(String channel) {
+	public String chanName(String channel)
+	{
 		String chan = "";
-		if(channel.startsWith("#")){
+		if(channel.startsWith("#"))
+		{
 			chan = channel.replace("#", "");
 		}
-		if (sChat.channels.keyExists(chan)) {
+		if (sChat.channels.keyExists(chan))
+		{
 			return sChat.channels.getString(chan);
 		}
 		return channel;
 	}
 
-	public String worldname(Player player) {
-		String world = "";
-		if (player.getWorld().getType() == World.Type.NORMAL) world = "normal";
-		else if (player.getWorld().getType() == World.Type.NETHER) world = "nether";
-		else if (player.getWorld().getType() == World.Type.END) world = "end";
-		else world = "normal";
-		  
-		if (sChat.worldnames.keyExists(world)) {
-			return sChat.worldnames.getString(world);
-		}
-		return world;
-	}
-
-	public String getColor(Player p) {
-		if (sChat.colors.keyExists(p.getName())) {
+	public String getColor(Player p)
+	{
+		if (sChat.colors.keyExists(p.getName()))
+		{
 			return sChat.colors.getString(p.getName());
 		}
 		return p.getName();
 	}
+	
+	public String censor(String text) {
+		String[] censorList = sChat.sconf.getString("censored-words").split(",");
+	    for (int i = 0; i < censorList.length; i++)
+	    {
+	    	text = text.replaceAll("(?i)\\b"+censorList[i]+"\\b", countLetters(censorList[i]));
+	    }
+	    return text;
+	}
+	
+	public String censorRemove(String text) {
+		String n = "";
+	    String[] censorList = sChat.sconf.getString("censored-words").split(",");
+	    for (int i = 0; i < censorList.length; i++)
+	    {
+	    	if (!text.equalsIgnoreCase(censorList[i])) {
+	    		n = n + censorList[i] + ",";
+	    	}
+	    }
+	    return n;
+	}
 	  
-	public static String getFormat(Player player, String message) {
-		String format = sChat.sconf.getString("chat-format");
-		if(format.contains("%player")) format = format.replace("%player", getName(player));
-		if(format.contains("%message")) format = format.replace("%message", replaceColor(message));
-		return format;
+	public String censorAdd(String text) {
+	    String list = sChat.sconf.getString("censored-words");
+	    list = list + text + ",";
+	    return list;
+	}
+	
+	public String countLetters(String str) {
+		int counter = 0;
+	    for (int i = 0; i < str.length(); i++) {
+	      if (Character.isLetter(str.charAt(i)))
+	        counter++;
+	    }
+	    str = buildAsterisk(counter);
+	    return str;
+	}
+
+	public String buildAsterisk(int length) {
+		String s = "";
+	    for (int i = 0; i < length; i++) {
+	    	s = s + "*";
+	    }
+	    return s;
 	}
 }

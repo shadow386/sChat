@@ -38,7 +38,7 @@ public class sListener extends PluginListener
 		  
 		Date now = new Date();
 		Format formatter = new SimpleDateFormat(sChat.sconf.getString("time-format"));
-		String timeFormat = Colors.Gray+formatter.format(now)+Colors.White;
+		String timeFormat = Colors.LightGray+formatter.format(now)+Colors.White;
 		String chatFormat = sChat.sconf.getString("chat-format");
 		String logFormat = sChat.sconf.getString("log-format");
 		String worldColor = sChat.sconf.getString(player.getWorld().getType().toString().toLowerCase()+"-world-color");
@@ -48,7 +48,6 @@ public class sListener extends PluginListener
 		if (logFormat.contains("%msg")) logFormat = logFormat.replaceAll("%msg", message);
 		if (logFormat.contains("%group")) logFormat = logFormat.replaceAll("%group", player.getGroups()[0]);
 		if (logFormat.contains("%name")) logFormat = logFormat.replaceAll("%name", player.getName());
-		//if (logFormat.contains("%chan") && sChat.channels.getBoolean("use-channels")) logFormat = logFormat.replaceAll("%name", sChat.core.getNickname(player));
 		if (logFormat.contains("\u00A7")) logFormat = logFormat.replaceAll("\u00A7", "&");
 		
 		sChat.log.info(logFormat);
@@ -59,8 +58,8 @@ public class sListener extends PluginListener
 		if (chatFormat.contains("%time")) chatFormat = chatFormat.replaceAll("%time", timeFormat);
 		if (chatFormat.contains("%msg")) chatFormat = chatFormat.replaceAll("%msg", Colors.White+message);
 		if (chatFormat.contains("%group")) chatFormat = chatFormat.replaceAll("%group", sChat.core.getGroupName(player));
-		if (chatFormat.contains("%name")) chatFormat = chatFormat.replaceAll("%name", sChat.core.getNickname(player)+Colors.White);
-		if (chatFormat.contains("%wc")) chatFormat = chatFormat.replaceAll("%wc", Colors.Marker+worldColor+Colors.White);
+		if (chatFormat.contains("%name")) chatFormat = chatFormat.replaceAll("%name", Colors.White+sChat.core.getNickname(player)+Colors.White);
+		if (chatFormat.contains("%wc")) chatFormat = chatFormat.replaceAll("%wc", Colors.Marker+worldColor);
 		if (chatFormat.contains("%chan") && sChat.channels.getBoolean("use-channels")) chatFormat = chatFormat.replaceAll("%chan", sChat.core.getChanName(connected.get(player)));
 		
 		if ((message.isEmpty()) || (message.length() < 1))
@@ -95,6 +94,13 @@ public class sListener extends PluginListener
 	public boolean onCommand(Player player, String[] split)
 	{
 		lastAction.put(player, new Date().getTime());
+		
+		if (split[0].equalsIgnoreCase("/load"))
+		{
+			sChat.sconf.getString(player.getWorld().getType().toString().toLowerCase()+"-world-color", "123");
+			player.sendMessage("Done!");
+			return true;
+		}
 		
 		if ((split[0].equalsIgnoreCase("/nickname") || split[0].equalsIgnoreCase("/nick")) && player.canUseCommand("/nickname"))
 		{

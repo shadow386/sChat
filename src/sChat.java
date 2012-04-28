@@ -16,7 +16,6 @@ public class sChat extends Plugin
 	public static PropertiesFile nicknames;
 	public static PropertiesFile groupnames;
 	public static PropertiesFile channels;
-	public static PropertiesFile colors;
 	
 	static final sCore core = new sCore();
 	
@@ -50,14 +49,13 @@ public class sChat extends Plugin
 		nicknames = new PropertiesFile(directory + "nicknames.properties");
 		groupnames = new PropertiesFile(directory + "groupnames.properties");
 		channels = new PropertiesFile(directory + "channels.properties");
-		colors = new PropertiesFile(directory + "colors.properties");
 		sconf = new PropertiesFile(directory + "schat.properties");
 		
 		sconf.getString("time-format", "hh:mm:ss");
-		sconf.getString("chat-format", "[%time]%wc[%group%wc] %name: %msg");
+		sconf.getString("chat-format", "[%time][%chan]%wc[%group%wc] %name: %msg");
 		sconf.getString("log-format", "<%name> %msg");
 		sconf.getString("normal-world-color", "f");
-		sconf.getString("end-world-color", "9");
+		sconf.getString("end-world-color", "8");
 		sconf.getString("nether-world-color", "4");
 		sconf.setString("censored-words", "fuck,shit,dick,ass,cunt,asshole,bitch,chink,cock,cum,douche,dyke,fag,faggot,kike,nigger,piss,pussy,queer,slut,whore,");
 		sconf.getBoolean("color-format", true);
@@ -65,12 +63,12 @@ public class sChat extends Plugin
 		sconf.getInt("afk-delay", 30);
 		
 		channels.getString("channels", "lobby,local,global,admin,god");
-	    channels.getBoolean("use-channels", true);
-	    channels.getInt("local-distance", 35);
 	    channels.getString("default-channel", "lobby");
 	    channels.getString("admin-channel", "admin");
 	    channels.getString("local-channel", "local");
 	    channels.getString("god-channel", "god");
+	    channels.getBoolean("use-channels", true);
+	    channels.getInt("local-distance", 35);
 		
 		etc.getLoader().addListener(PluginLoader.Hook.CHAT, listener, this, PluginListener.Priority.MEDIUM);
 		etc.getLoader().addListener(PluginLoader.Hook.COMMAND, listener, this, PluginListener.Priority.MEDIUM);
